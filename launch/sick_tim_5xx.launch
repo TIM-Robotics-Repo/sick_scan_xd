@@ -21,7 +21,7 @@
 <launch>
     <arg name="hostname" default="192.168.1.101"/>
     <arg name="cloud_topic" default="cloud"/>
-    <arg name="frame_id" default="cloud"/>
+    <arg name="frame_id" default="base_scan"/>
     <arg name="sw_pll_only_publish" default="true"/>
     <arg name="nodename" default="sick_tim_5xx"/>
     <arg name="port" default="2112"/>
