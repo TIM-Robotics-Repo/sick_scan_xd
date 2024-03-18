@@ -15,6 +15,10 @@ else()
     message(STATUS "Option CMAKE_ENABLE_EMULATOR = ${CMAKE_ENABLE_EMULATOR}, building ${PROJECT_NAME} without emulator support, ENABLE_EMULATOR=${ENABLE_EMULATOR}")
 endif()
 
+if(NOT DEFINED LDMRS)
+    set(LDMRS 0) 
+endif()	
+
 # LDMRS build options
 option(BUILD_WITH_LDMRS_SUPPORT "Build ${PROJECT_NAME} with LDMRS support (ON, libsick_ldmrs from https://github.com/SICKAG/libsick_ldmrs required) or without LDMRS support (OFF)" OFF)
 if(WIN32)
@@ -26,6 +30,11 @@ else()
 endif()
 
 # SCANSEGMENT_XD/MULTISCAN136 build options
+
+if(NOT DEFINED SCANSEGMENT_XD)
+    set(SCANSEGMENT_XD 0)
+endif()	
+
 option(BUILD_WITH_SCANSEGMENT_XD_SUPPORT "Build ${PROJECT_NAME} with SCANSEGMENT_XD support (ON) or without SCANSEGMENT_XD support (OFF)" ON)
 if(SCANSEGMENT_XD EQUAL 0)
     set(BUILD_WITH_SCANSEGMENT_XD_SUPPORT OFF CACHE BOOL "Build ${PROJECT_NAME} with SCANSEGMENT_XD support (ON) or without SCANSEGMENT_XD support (OFF)" FORCE)
@@ -95,7 +104,10 @@ elseif(DEFINED SICK_TARGET_ENDIANESS)
 endif()
 
 # ROS Version
-if(NOT DEFINED ROS_VERSION AND DEFINED ENV{ROS_VERSION})
+if(NOT DEFINED ROS_VERSION)
+    set(ROS_VERSION 2)
+endif()
+if(DEFINED ENV{ROS_VERSION})
     set(ROS_VERSION $ENV{ROS_VERSION})
 endif()
 add_compile_options(-D__ROS_VERSION=${ROS_VERSION})
