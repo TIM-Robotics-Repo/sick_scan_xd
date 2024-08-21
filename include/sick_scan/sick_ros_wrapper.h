@@ -257,8 +257,10 @@ public:
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include "tim_common_utils/lifecycle_node.h"
 
-typedef rclcpp::Node::SharedPtr rosNodePtr;
+typedef tim_common_utils::LifecycleNode rosNode;
+typedef std::shared_ptr<rosNode> rosNodePtr;
 
 #define ros_nav_msgs nav_msgs::msg
 #define ros_sensor_msgs sensor_msgs::msg
@@ -401,8 +403,8 @@ template <typename T> void rosPublish(rosPublisher<T>& publisher, const T& msg) 
 template <typename T> std::string rosTopicName(rosPublisher<T>& publisher) { return publisher->get_topic_name(); }
 
 inline bool rosOk(void) { return !shutdownSignalReceived() && rclcpp::ok(); }
-inline void rosSpin(rosNodePtr nh) { rclcpp::spin(nh); }
-inline void rosSpinOnce(rosNodePtr nh) { rclcpp::spin_some(nh); }
+inline void rosSpin(rosNodePtr nh) { rclcpp::spin(nh->get_node_base_interface()); }
+inline void rosSpinOnce(rosNodePtr nh) { rclcpp::spin_some(nh->get_node_base_interface()); }
 inline void rosShutdown(void) { rclcpp::shutdown(); }
 inline void rosSleep(double seconds) { rclcpp::sleep_for(std::chrono::nanoseconds((int64_t)(seconds * 1.0e9))); }
 inline rosDuration rosDurationFromSec(double seconds) { return rosDuration(std::chrono::nanoseconds((int64_t)(seconds * 1.0e9))); }

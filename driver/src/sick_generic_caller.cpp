@@ -83,6 +83,53 @@
 
 // std::string getVersionInfo();
 
+
+#if defined __ROS_VERSION && __ROS_VERSION == 2
+class SickLifecycleNode : public tim_common_utils::LifecycleNode
+{
+  public:
+    SickLifecycleNode(const std::string & node_name, const std::string & node_namespace = "", rclcpp::NodeOptions options = rclcpp::NodeOptions())
+    : tim_common_utils::LifecycleNode(node_name, node_namespace, options)
+    {
+    }
+    void SetInput(int argc, char **argv, std::string nodeName) {
+      this->argc = argc;
+      this->argv = argv;
+      this->nodeName = nodeName;
+    }
+  protected:
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State &) override
+    {
+      RCLCPP_INFO(get_logger(), "Configuring");
+      return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+    }
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State &) override
+    {
+      RCLCPP_INFO(get_logger(), "Activating");
+      if(!startGenericLaser(argc, argv, nodeName, shared_from_this(), &result)) {
+        RCLCPP_ERROR(get_logger(), "## ERROR in SickLifecycleNode::on_activate(): startGenericLaser() failed, could not start generic laser event loop");
+        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
+      }
+      return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+    }
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &) override
+    {
+      RCLCPP_INFO(get_logger(), "Deactivating");
+      return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+    }
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &) override
+    {
+      RCLCPP_INFO(get_logger(), "Cleaning up");
+      return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+    }
+  private:
+    int argc;
+    char **argv;
+    std::string nodeName;
+    int result;
+};
+#endif
+
 /*!
 \brief Startup routine - if called with no argmuments we assume debug session.
        Set scanner name variable by parsing for "__name:=". This will be changed in the future
@@ -147,7 +194,7 @@ int main(int argc, char** argv)
     rclcpp::NodeOptions node_options;
     node_options.allow_undeclared_parameters(true);
     //node_options.automatically_declare_initial_parameters(true);
-    rosNodePtr node = rclcpp::Node::make_shared("sick_scan", "", node_options);
+    auto node = std::make_shared<SickLifecycleNode>("sick_scan", "", node_options);
 #else
   ros::init(argc, argv, scannerName, ros::init_options::NoSigintHandler);  // scannerName holds the node-name
   // signal(SIGINT, rosSignalHandler);
@@ -173,14 +220,8 @@ int main(int argc, char** argv)
   try
   {
     // result = mainGenericLaser(argc_tmp, argv_tmp, scannerName, node);
-    if (!startGenericLaser(argc_tmp, argv_tmp, scannerName, node, &result))
-    {
-      ROS_ERROR_STREAM("## ERROR in sick_generic_caller::main(): startGenericLaser() failed, could not start generic laser event loop");
-    }
-    else
-    {
-      rosSpin(node);
-    }
+    node->SetInput(argc_tmp, argv_tmp, scannerName);
+    rosSpin(node);
     stopScannerAndExit();
     joinGenericLaser();
   }

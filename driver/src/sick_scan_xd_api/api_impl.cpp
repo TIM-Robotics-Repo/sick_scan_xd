@@ -639,7 +639,7 @@ SickScanApiHandle SickScanApiCreate(int argc, char** argv)
         rclcpp::init(argc, argv);
         rclcpp::NodeOptions node_options;
         node_options.allow_undeclared_parameters(true);
-        rosNodePtr node = rclcpp::Node::make_shared("sick_scan", "", node_options);
+        rosNodePtr node = std::make_shared<rosNode>("sick_scan", "", node_options);
         SickScanApiHandle apiHandle = castNodeToApiHandle(node);
         #else
         ros::init(argc, argv, s_scannerName, ros::init_options::NoSigintHandler);

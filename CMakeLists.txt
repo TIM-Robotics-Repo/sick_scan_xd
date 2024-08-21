@@ -261,6 +261,7 @@ if(ROS_VERSION EQUAL 2)
     find_package(tf2 REQUIRED)
     find_package(tf2_ros REQUIRED)
     find_package(visualization_msgs REQUIRED)
+    find_package(tim_common_utils REQUIRED)
     if(${ENABLE_EMULATOR} OR ENABLE_EMULATOR EQUAL ON)
         set(ROSIDL_EMULATOR_FILES
             # emulator messages
@@ -678,6 +679,7 @@ if(ROS_VERSION EQUAL 2)
         "visualization_msgs"
         "tf2_ros"
         "${diagnostic_updater_pkg}"
+        "tim_common_utils"
         ${LDMRS_TARGET_DEPENDENCIES}
     )
 
@@ -692,6 +694,7 @@ if(ROS_VERSION EQUAL 2)
         "visualization_msgs"
         "tf2_ros"
         "${diagnostic_updater_pkg}"
+        "tim_common_utils"
         ${LDMRS_TARGET_DEPENDENCIES}
     )
 
@@ -706,6 +709,7 @@ if(ROS_VERSION EQUAL 2)
         "visualization_msgs"
         "tf2_ros"
         "${diagnostic_updater_pkg}"
+        "tim_common_utils"
         ${LDMRS_TARGET_DEPENDENCIES}
     )
 
